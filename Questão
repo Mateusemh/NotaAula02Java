@@ -1,0 +1,115 @@
+// Produto.java
+public class Produto {
+    private int codigo;
+    private String nome;
+    private String tamanho;
+    private String cor;
+    private double valor;
+    private int estoque;
+
+    public Produto(int codigo, String nome, String tamanho, String cor, double valor, int estoque) {
+        this.codigo = codigo;
+        this.nome = nome;
+        this.tamanho = tamanho;
+        this.cor = cor;
+        this.valor = valor;
+        this.estoque = estoque;
+    }
+
+    public void mostrar() {
+        System.out.println("Código: " + codigo);
+        System.out.println("Nome: " + nome);
+        System.out.println("Tamanho: " + tamanho);
+        System.out.println("Cor: " + cor);
+        System.out.println("Valor: " + valor);
+        System.out.println("Estoque: " + estoque);
+    }
+
+    public void vender(int qtd, String formaPgto, double pago) {
+        if (qtd > estoque) {
+            System.out.println("Não temos no estoque");
+            return;
+        }
+
+        double total = valor * qtd;
+        if (formaPgto.equalsIgnoreCase("pix") || formaPgto.equalsIgnoreCase("debito") || formaPgto.equalsIgnoreCase("transferencia") || formaPgto.equalsIgnoreCase("especie")) {
+            total *= 0.95;
+            System.out.println("Valor com desconto: R$ " + total);
+            if (formaPgto.equalsIgnoreCase("especie") && pago > total) {
+                System.out.println("Troco: R$ " + (pago - total));
+            }
+        } else if (formaPgto.equalsIgnoreCase("credito")) {
+            System.out.println("Parcelado em 3x de R$ " + (total / 3));
+        } else {
+            System.out.println("Forma de pagamento inválida.");
+            return;
+        }
+
+        estoque -= qtd;
+        System.out.println("Venda aprovada, estoque: " + estoque);
+    }
+
+    public void adicionar(int qtd) {
+        estoque += qtd;
+        System.out.println("Estoque atual: " + estoque);
+    }
+}
+
+// Main.java
+import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        System.out.print("Código: ");
+        int cod = sc.nextInt();
+        sc.nextLine();
+        System.out.print("Nome: ");
+        String nome = sc.nextLine();
+        System.out.print("Tamanho: ");
+        String tam = sc.nextLine();
+        System.out.print("Cor: ");
+        String cor = sc.nextLine();
+        System.out.print("Valor: ");
+        double val = sc.nextDouble();
+        System.out.print("Estoque inicial: ");
+        int est = sc.nextInt();
+
+        Produto p = new Produto(cod, nome, tam, cor, val, est);
+
+        int opcao;
+        do {
+            System.out.println("\n1 - Ver produto");
+            System.out.println("2 - Vender produto");
+            System.out.println("3 - Adicionar estoque");
+            System.out.println("0 - Sair");
+            System.out.print("Opção: ");
+            opcao = sc.nextInt();
+            sc.nextLine();
+
+            if (opcao == 1) {
+                p.mostrar();
+            } else if (opcao == 2) {
+                System.out.print("Qtd venda: ");
+                int qtd = sc.nextInt();
+                sc.nextLine();
+                System.out.print("Forma de pagamento (pix, especie, transferencia, debito, credito): ");
+                String fp = sc.nextLine();
+                double pago = 0;
+                if (fp.equalsIgnoreCase("especie")) {
+                    System.out.print("Valor pago: ");
+                    pago = sc.nextDouble();
+                }
+                p.vender(qtd, fp, pago);
+            } else if (opcao == 3) {
+                System.out.print("Quantidade para adicionar: ");
+                int add = sc.nextInt();
+                p.adicionar(add);
+            }
+
+        } while (opcao != 0);
+
+        sc.close();
+    }
+}
